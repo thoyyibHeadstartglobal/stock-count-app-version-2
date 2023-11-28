@@ -1624,6 +1624,23 @@ class SQLHelper {
 
   }
 
+  TRANSDETAILSCOUNTMJ() async {
+    final db = await SQLHelper.db();
+
+    List<Map<String, dynamic>>? dt;
+    try {
+
+
+      dt = await db.rawQuery("SELECT COUNT(*) FROM TRANSDETAILS where TRANSTYPE=22");
+    }
+    catch(e){
+        return e;
+    }
+
+    return dt;
+
+  }
+
   //add transaction headers
   addTRANSDETAILS(
       {HRecId,
