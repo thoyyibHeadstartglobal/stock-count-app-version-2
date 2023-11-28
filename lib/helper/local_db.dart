@@ -82,7 +82,10 @@ class SQLHelper {
            UNIT TEXT,
            ItemAmount TEXT,
            BatchEnabled BOOLEAN,
-           BatchedItem BOOLEAN
+           BatchedItem BOOLEAN,
+           ItemPOBlocked BOOLEAN,
+           ItemSOBlocked BOOLEAN,
+           ItemInventBlocked BOOLEAN
       )
       """);
 
@@ -368,26 +371,80 @@ class SQLHelper {
   }
 
   // get db data by count
-  Future<dynamic> getItemMatersByCount() async {
+  Future<dynamic> getItemMatersByCount(transactionType) async {
     final db = await SQLHelper.db();
 
-    final List<Map<String, dynamic>> maps = await db.rawQuery(''
-        'select * from  ITEMMASTER  LIMIT 15;'
+    final List<Map<String, dynamic>> maps =
+
+    transactionType == "PO" ?
+    await db.rawQuery(''
+        'select * FROM ITEMMASTER Where  ItemPOBlocked != 1  LIMIT 15;'
+        '')
+        :
+    transactionType == "TO"
+        || transactionType == "MJ" ?
+
+    await db.rawQuery(''
+        'select * FROM ITEMMASTER Where  ItemInventBlocked != 1 LIMIT 15;'
+        ''):
+    await db.rawQuery(''
+        'select * FROM ITEMMASTER   LIMIT 15;'
         '');
 
     print(maps);
     return maps;
   }
+
 
   // get db data
-  Future<dynamic> getItemMaters(int? lastId) async {
+  Future<dynamic> getItemMaters(transactionType,int? lastId) async {
+
+    print("DB trans-type : $transactionType");
+
     final db = await SQLHelper.db();
-    final List<Map<String, dynamic>> maps = await db.rawQuery(''
-        'select * FROM ITEMMASTER Where id > $lastId LIMIT 15;'
+
+    final List<Map<String, dynamic>>
+
+    maps =
+    transactionType == "PO" ?
+    await db.rawQuery(''
+        'select * FROM ITEMMASTER Where id > $lastId AND ItemPOBlocked != 1  LIMIT 15;'
+        '')
+        :
+    transactionType == "TO"
+        || transactionType == "MJ" ?
+
+    await db.rawQuery(''
+        'select * FROM ITEMMASTER Where id > $lastId  AND ItemInventBlocked != 1 LIMIT 15;'
+        ''):
+    await db.rawQuery(''
+        'select * FROM ITEMMASTER Where id > $lastId  LIMIT 15;'
         '');
     print(maps);
     return maps;
   }
+
+  // // get db data by count
+  // Future<dynamic> getItemMatersByCount() async {
+  //   final db = await SQLHelper.db();
+  //
+  //   final List<Map<String, dynamic>> maps = await db.rawQuery(''
+  //       'select * from  ITEMMASTER  LIMIT 15;'
+  //       '');
+  //
+  //   print(maps);
+  //   return maps;
+  // }
+  //
+  // // get db data
+  // Future<dynamic> getItemMaters(int? lastId) async {
+  //   final db = await SQLHelper.db();
+  //   final List<Map<String, dynamic>> maps = await db.rawQuery(''
+  //       'select * FROM ITEMMASTER Where id > $lastId LIMIT 15;'
+  //       '');
+  //   print(maps);
+  //   return maps;
+  // }
 
   // get db data
   Future<dynamic> getUOMMessures() async {
@@ -988,20 +1045,23 @@ class SQLHelper {
 
   Future<int> addItemMasterToPullData(
       {ITEMBARCODE,
-      ItemId,
-      ItemName,
-      DATAAREAID,
-      WAREHOUSE,
-      CONFIGID,
-      COLORID,
-      SIZEID,
-      STYLEID,
-      INVENTSTATUS,
-      QTY,
-      UNIT,
-      ItemAmount,
-      BatchEnabled,
-      BatchedItem}) async {
+        ItemId,
+        ItemName,
+        DATAAREAID,
+        WAREHOUSE,
+        CONFIGID,
+        COLORID,
+        SIZEID,
+        STYLEID,
+        INVENTSTATUS,
+        QTY,
+        UNIT,
+        ItemAmount,
+        BatchEnabled,
+        BatchedItem,
+        ItemPOBlocked,
+        ItemSOBlocked,
+        ItemInventBlocked}) async {
     final db = await SQLHelper.db();
 
     final data = {
@@ -1019,8 +1079,12 @@ class SQLHelper {
       "UNIT": UNIT,
       "ItemAmount": ItemAmount,
       "BatchEnabled": BatchEnabled,
-      "BatchedItem": BatchedItem
+      "BatchedItem": BatchedItem,
+      "ItemPOBlocked":ItemPOBlocked,
+      "ItemSOBlocked":ItemSOBlocked,
+      "ItemInventBlocked":ItemInventBlocked
     };
+
 
     final id = await db.insert('ITEMMASTER', data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
@@ -1557,6 +1621,7 @@ class SQLHelper {
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
 
     return id;
+
   }
 
   //add transaction headers

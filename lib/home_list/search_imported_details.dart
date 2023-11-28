@@ -672,7 +672,7 @@ class _SearchImportedDetailsPageState extends State<SearchImportedDetailsPage> {
 
                                                       HRecId: transactionData[0]
                                                       ['RecId'],
-                                                      STATUS: 0,
+                                                      STATUS: 1,
                                                       AXDOCNO: transactionData[0]
                                                       ['AXDOCNO'],
                                                       DOCNO: transactionData[0]
@@ -839,6 +839,7 @@ class _SearchImportedDetailsPageState extends State<SearchImportedDetailsPage> {
                                                             "STOCK COUNT" ||
                                                     widget.transactionType ==
                                                         "ST") {
+
                                                   ScaffoldMessenger.of(context)
                                                       .showSnackBar(
                                                     const SnackBar(

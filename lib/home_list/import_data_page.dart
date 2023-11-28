@@ -587,7 +587,10 @@ class _ImportDataPageState extends State<ImportDataPage> {
           UNIT: element['UNIT'],
           ItemAmount: element['ItemAmount'],
             BatchEnabled: element['BatchEnabled'],
-          BatchedItem: element['BatchedItem']
+          BatchedItem: element['BatchedItem'],
+          ItemPOBlocked:element['ItemPOBlocked'] ,
+          ItemSOBlocked:element['ItemSOBlocked'] ,
+          ItemInventBlocked: element['ItemInventBlocked'] ,
         );
       });
 
@@ -763,7 +766,10 @@ class _ImportDataPageState extends State<ImportDataPage> {
           UNIT: element['UNIT'],
           ItemAmount: element['ItemAmount'],
             BatchEnabled: element['BatchEnabled'],
-          BatchedItem: element['BatchedItem']
+          BatchedItem: element['BatchedItem'],
+          ItemPOBlocked:element['ItemPOBlocked'] ,
+          ItemSOBlocked:element['ItemSOBlocked'] ,
+          ItemInventBlocked: element['ItemInventBlocked']
 
         );
       });

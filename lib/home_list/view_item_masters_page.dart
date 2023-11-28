@@ -698,11 +698,23 @@ class _ViewItemsOldPageState extends State<ViewItemsOldPage> {
 
     print("data initial 687");
 
-    if( widget.transactionType == "PO"){
-      transactionData = await _sqlHelper.getTRANSHEADER(
-          widget.transactionType == "PO" ? "3": "");
+    if (widget.transactionType == "PURCHASE ORDER")
+    {
+      transactionData = await _sqlHelper
+          .getTRANSHEADER(widget.transactionType == "PURCHASE ORDER" ? "3" : "");
     }
-    itemMasters.addAll(await   _sqlHelper.getItemMatersByCount());
+    itemMasters.addAll(await _sqlHelper
+        .getItemMatersByCount(
+        widget.transactionType == "PURCHASE ORDER" ?
+        "PO":
+        widget.transactionType
+            == "MOVEMENT JOURNAL" ?
+        "MJ":
+        widget.transactionType
+            == "TRANSFER ORDER" ? "TO" :
+        widget.transactionType
+    )
+    );
 
    if( itemMasters.isEmpty ){
      setState((){
@@ -1260,7 +1272,54 @@ class _ViewItemsOldPageState extends State<ViewItemsOldPage> {
                                   Expanded(child: Text("Batched Item : ")),
                                   Expanded(child: Text(itemMastersLists[index]['BatchedItem'].toString()== "0"? "false" : "true" )),
                                 ],
-                              )
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                children: [
+                                  Expanded(child: Text("PO Blocked :")),
+                                  Expanded(
+                                      child: Text(itemMastersLists[index]
+                                      ['ItemPOBlocked']
+                                          .toString() ==
+                                          "0"
+                                          ? "false"
+                                          : "true"))
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                children: [
+                                  Expanded(child: Text("SO Blocked :")),
+                                  Expanded(
+                                      child: Text(itemMastersLists[index]
+                                      ['ItemSOBlocked']
+                                          .toString() ==
+                                          "0"
+                                          ? "false"
+                                          : "true"))
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                      child: Text("INVENT Blocked :")),
+                                  Expanded(
+                                      child: Text(itemMastersLists[index][
+                                      'ItemInventBlocked']
+                                          .toString() ==
+                                          "0"
+                                          ? "false"
+                                          : "true"))
+                                ],
+                              ),
+
                             ],
                           )),
                     );
@@ -1371,9 +1430,38 @@ class _ViewItemsOldPageState extends State<ViewItemsOldPage> {
 
 
   setvalue() async {
-    itemMasters.addAll(await   _sqlHelper.getItemMaters(itemMastersLists[itemMastersLists.length-1]['id']));
+    // itemMasters.addAll(await   _sqlHelper.getItemMaters(itemMastersLists[itemMastersLists.length-1]['id']));
+    //
+    // itemMastersLists.addAll(await   _sqlHelper.getItemMaters(itemMastersLists[itemMastersLists.length-1]['id']));
 
-    itemMastersLists.addAll(await   _sqlHelper.getItemMaters(itemMastersLists[itemMastersLists.length-1]['id']));
+
+    itemMasters.addAll(
+        await _sqlHelper
+            .getItemMaters(
+            widget.transactionType == "PURCHASE ORDER" ?
+            "PO":
+            widget.transactionType
+                == "MOVEMENT JOURNAL" ?
+            "MJ":
+            widget.transactionType
+                == "TRANSFER ORDER" ? "TO" :
+            widget.transactionType,
+            itemMastersLists[itemMastersLists.length - 1]['id']));
+
+
+    itemMastersLists.addAll(
+        await _sqlHelper
+            .getItemMaters(widget.transactionType == "PURCHASE ORDER" ?
+        "PO":
+        widget.transactionType
+            == "MOVEMENT JOURNAL" ?
+        "MJ":
+        widget.transactionType
+            ==
+            "TRANSFER ORDER" ? "TO" :
+        widget.transactionType,
+            itemMastersLists[itemMastersLists.length - 1]['id']));
+
 
     //  List<dynamic> ? masterList;
     //  masterList!.addAll(await   _sqlHelper.getItemMaters(itemMastersLists[itemMastersLists.length-1]['id']));
