@@ -229,7 +229,7 @@ class _LoginPageState extends State<LoginPage> {
                                 // ));
                               } else {
                                 var result = await _sqlHelper.checkAdminUserLogin(
-                                    userId: userIdController.text.toLowerCase(),
+                                    userId: userIdController.text.trim().toLowerCase(),
                                     password: passwordController.text
                                         ,
                                 );
@@ -253,7 +253,7 @@ class _LoginPageState extends State<LoginPage> {
                                   prefs = await SharedPreferences.getInstance();
 
                                 dynamic log = await  _sqlHelper.checkAdminUserLoginByLoad(
-                                    userId: userIdController.text.toString().toLowerCase() ,
+                                    userId: userIdController.text.toString().trim().toLowerCase() ,
                                     password: passwordController.text.toString()
                                   );
                                 print("log is");
@@ -284,6 +284,7 @@ class _LoginPageState extends State<LoginPage> {
                                   //     textAlign: TextAlign.center,
                                   //   ),
                                   // ));
+
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(

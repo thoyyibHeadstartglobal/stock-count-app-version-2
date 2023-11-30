@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dynamicconnectapp/constants/constant.dart';
 import 'package:dynamicconnectapp/home_list/import_data_page.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../app_setting_pages/app_settings_page.dart';
@@ -343,6 +345,9 @@ class _LandingHomePageState extends State<LandingHomePage> {
     }
   }
 
+  // DateTime ? now = DateTime.now();
+  String formattedDate = DateFormat('yyyyMMdd').format(DateTime.now());
+
   getToken() async {
     setState(() {});
     print("init Api");
@@ -443,6 +448,79 @@ class _LandingHomePageState extends State<LandingHomePage> {
       // getTatmeenDetails();
       print(token);
     } catch (e) {}
+
+
+    await _sqlHelper.initDb();
+
+
+    File source1 = File(
+        '/storage/emulated/0/Android/data/com.example.dynamicconnectapps/files/stockCountApp/dynamicconnectdb.db');
+
+    Directory copyTo = Directory(
+        "/storage/emulated/0/Download/stockCountApp");
+
+    var status = await Permission.storage.status;
+
+    if (!status.isGranted) {
+      await Permission.storage.request();
+    }
+
+    bool storagePermission =
+    await Permission.storage.isGranted;
+    bool mediaPermission =
+    await Permission.accessMediaLocation.isGranted;
+    bool manageExternal =
+    await Permission.manageExternalStorage.isGranted;
+
+    if (!storagePermission) {
+      storagePermission =
+      await Permission.storage.request().isGranted;
+    }
+
+    if (!mediaPermission) {
+      mediaPermission = await Permission
+          .accessMediaLocation
+          .request()
+          .isGranted;
+    }
+
+    if (!manageExternal) {
+      manageExternal = await Permission
+          .manageExternalStorage
+          .request()
+          .isGranted;
+    }
+
+    bool isPermissionGranted = storagePermission &&
+        mediaPermission &&
+        manageExternal;
+
+    if (isPermissionGranted) {
+      print("Permission  Granted :"
+          "storage : ${storagePermission}\t"
+          "Media :${mediaPermission}\t"
+          "Manage External : ${manageExternal}");
+    }
+    else
+    {
+      print("Permission Not Granted :"
+          "storage : ${storagePermission}\t"
+          "Media :${mediaPermission}\t"
+          "Manage External : ${manageExternal}");
+    }
+
+
+    await copyTo.create();
+
+    String? newPath =
+        "${copyTo.path}/HSSTOCKCOUNTAPP_BKP_${formattedDate}.db";
+
+
+
+    await source1.copy(newPath);
+
+
+
   }
 
   getDevices() async {

@@ -6,21 +6,21 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:dynamicconnectapp/helper/local_db.dart';
 import 'package:dynamicconnectapp/common_pages/login_page.dart';
-import 'package:file_picker/file_picker.dart';
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
+
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'package:sqflite/sqflite.dart';
 
 import '../constants/constant.dart';
 import '../common_pages/home_page.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class AppGeneralPage extends StatefulWidget {
+
   AppGeneralPage({Key? key}) : super(key: key);
 
   @override
@@ -271,6 +271,461 @@ class _AppGeneralPageState extends State<AppGeneralPage> {
     }
     // devices = [];
     // devices = responseJson[0]['pullData'];
+  }
+
+  showDialogRestoreRoute({String? text}) {
+    // set up the button
+    Widget yesButton = TextButton(
+      style: APPConstants().btnBackgroundYes,
+      child: Text(
+        "Yes",
+        style: APPConstants().YesText,
+      ),
+      onPressed: () async {
+        print("Scanning code");
+        setState(() {});
+        Navigator.pop(context);
+        File source1 = File(
+            '/storage/emulated/0/Download/stockCountApp/dynamicconnectdb.db');
+
+        Directory copyTo = Directory(
+            '/storage/emulated/0/Android/data/com.example.dynamicconnectapps/files/stockCountApp');
+        // "/storage/emulated/0/Download/stockCountApp");
+
+        var status = await Permission.storage.status;
+
+        if (!status.isGranted) {
+          await Permission.storage.request();
+        }
+
+        bool storagePermission =
+            await Permission.storage.isGranted;
+        bool mediaPermission =
+            await Permission.accessMediaLocation.isGranted;
+        bool manageExternal =
+            await Permission.manageExternalStorage.isGranted;
+
+        if (!storagePermission) {
+          storagePermission =
+              await Permission.storage.request().isGranted;
+        }
+
+        if (!mediaPermission) {
+          mediaPermission = await Permission
+              .accessMediaLocation
+              .request()
+              .isGranted;
+        }
+
+        if (!manageExternal) {
+          manageExternal = await Permission
+              .manageExternalStorage
+              .request()
+              .isGranted;
+        }
+
+        bool isPermissionGranted = storagePermission &&
+            mediaPermission &&
+            manageExternal;
+
+        if (isPermissionGranted) {
+          print("Permission  Granted :"
+              "storage : ${storagePermission}\t"
+              "Media :${mediaPermission}\t"
+              "Manage External : ${manageExternal}");
+        } else {
+          print("Permission Not Granted :"
+              "storage : ${storagePermission}\t"
+              "Media :${mediaPermission}\t"
+              "Manage External : ${manageExternal}");
+        }
+
+        var databasespath = await getExternalStorageDirectory();
+
+
+        print("The original path is : ${databasespath!.path}/stockCountApp/dynamicconnectdb.db");
+
+
+        // var databasesPath = await getDatabasesPath();
+        var dbPath = '${databasespath.path}/stockCountApp/dynamicconnectdb.db';
+
+        // var result = await FilesystemPicker.open(allowedExtensions: [".png", ".jpg"],
+        //     context: context,rootDirectory: appDocDir);
+
+
+        // await showDialogExternalLocation("Last Backups ");
+        //
+        //
+        //
+        //
+        // // file picker
+        //
+        //
+        // FilePickerResult? result =
+        // await FilePicker.platform.pickFiles(
+        //   type: FileType.custom,
+        //   // allowedExtensions: ['db'],
+        //   // allowMultiple: false
+        // );
+        //
+        // // FilePicker.platform.getDirectoryPath().;
+        // // getFilePath(type: FileType.CUSTOM, fileExtension: 'json’);
+        //
+        // if (result != null) {
+        //
+        //   File source = File(result.files.single.path!);
+        //   await source.copy(dbPath);
+        //   // setState(() {
+        //   //   message = 'Successfully Restored DB';
+        //   // });
+        // } else {
+        //   // User canceled the picker
+        //
+        // }
+
+
+
+
+
+
+
+        // final result = await FilePicker.platform.pickFiles(
+        //   type: FileType.custom,
+        //   allowedExtensions: ['json'],
+        // );
+        //
+        // if (result != null) {
+        //
+        //   File file = File(result.files.single.path!);
+        //
+        //   print("The file is : ${file}");
+        // } else {
+        //   print("No file selected");
+        // }
+        // if (await File("${copyTo.path}/dynamicconnectapp.db")
+        //     .exists()) {
+        //
+        //   showDialogCheck("File Already exist in the specific download folder");
+        //   print("file Exist");
+        //   return;
+        // }
+
+        // try{
+        //
+        // await source1.create();
+
+
+        ///delete file  after rename
+
+        // await File(filepath).delete();
+        // await file.delete();
+
+        /// rename file to db folder
+        ///
+        // file.rename(newPath);
+
+        /// rename file with example
+
+
+        // final file = File("filepath here"); // Your file path
+        // String dir = path.dirname(file.path); // Get directory
+        // String newPath = path.join(dir, 'new file name'); // Rename
+        // print(newPath); // Here is the newpath
+        // file.renameSync(newPath)
+
+
+
+        print("Restore Success : ${copyTo.path}/dynamicconnectdb.db");
+        print("Directory : ${source1}");
+
+
+        String? newPath =
+            "${copyTo.path}/dynamicconnectdb.db";
+
+        await source1.copy(newPath);
+
+
+        showDialogCheck("Restore Success Date  ${DateTime.now().toIso8601String().substring(0,10)}");
+
+      },
+    );
+
+    Widget noButton =
+     TextButton(
+         style: APPConstants().btnBackgroundNo,
+         onPressed: () {
+           Navigator.pop(context);
+         },
+         child: Text(
+           "No",
+           style: APPConstants().YesText,
+     )
+     );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("DynamicsConnect"),
+      content: Text("$text"),
+      actions: [
+        yesButton,
+        noButton
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+
+  showDialogBackUpRoute({String? text}) {
+    // set up the button
+    Widget yesButton = TextButton(
+      style: APPConstants().btnBackgroundYes,
+      child: Text(
+        "Yes",
+        style: APPConstants().YesText,
+      ),
+      onPressed: () async {
+        print("Scanning code");
+        setState(() {});
+        Navigator.pop(context);
+        File source1 = File(
+            '/storage/emulated/0/Android/data/com.example.dynamicconnectapps/files/stockCountApp/dynamicconnectdb.db');
+
+        Directory copyTo = Directory(
+            "/storage/emulated/0/Download/stockCountApp");
+
+        var status = await Permission.storage.status;
+
+        if (!status.isGranted) {
+          await Permission.storage.request();
+        }
+
+        bool storagePermission =
+            await Permission.storage.isGranted;
+        bool mediaPermission =
+            await Permission.accessMediaLocation.isGranted;
+        bool manageExternal =
+            await Permission.manageExternalStorage.isGranted;
+
+        if (!storagePermission) {
+          storagePermission =
+              await Permission.storage.request().isGranted;
+        }
+
+        if (!mediaPermission) {
+          mediaPermission = await Permission
+              .accessMediaLocation
+              .request()
+              .isGranted;
+        }
+
+        if (!manageExternal) {
+          manageExternal = await Permission
+              .manageExternalStorage
+              .request()
+              .isGranted;
+        }
+
+        bool isPermissionGranted = storagePermission &&
+            mediaPermission &&
+            manageExternal;
+
+        if (isPermissionGranted) {
+          print("Permission  Granted :"
+              "storage : ${storagePermission}\t"
+              "Media :${mediaPermission}\t"
+              "Manage External : ${manageExternal}");
+        }
+        else
+        {
+          print("Permission Not Granted :"
+              "storage : ${storagePermission}\t"
+              "Media :${mediaPermission}\t"
+              "Manage External : ${manageExternal}");
+        }
+
+        // var lastDateTime = await _sqlHelper.getLastBackUpDetails();
+        //
+        //   print("Last Time BackUp : ${lastDateTime.toString()}");
+        //
+        //   // return;
+        //
+        //   if(lastDateTime == null ){
+        //
+        //     if (await File("${copyTo.path}/dynamicconnectdb.db")
+        //         .exists())
+        //     {
+        //       await copyTo.create();
+        //
+        //       String? newPath =
+        //           "${copyTo.path}/dynamicconnectdb.db";
+        //
+        //       await source1.copy(newPath);
+        //       await _sqlHelper.setBackUpTime();
+        //       showDialogCheck("Backup Added in the Device Download Folder");
+        //       print("file Exist");
+        //       return;
+        //     }
+        //     else{
+        //       await copyTo.create();
+        //
+        //       String? newPath =
+        //           "${copyTo.path}/dynamicconnectdb.db";
+        //
+        //       await source1.copy(newPath);
+        //       await _sqlHelper.setBackUpTime();
+        //       showDialogCheck("Backup Added in the Device Download Folder");
+        //       print("file Exist");
+        //       return;
+        //     }
+        //
+        //   }
+        //   else
+        //   {
+        //
+        //     String formattedDate = DateFormat('yyyy-MM-dd')
+        //         .format(DateTime.parse(lastDateTime['backUpTime'].toString()));
+        //
+        //     print("Formatted Date Line 813 : $formattedDate");
+        //     // var format =  DateFormat('dd-MM-yyyy');
+        //
+        //     // print("Formatted : ${format.parse(lastDateTime['backUpTime'].toString().substring(12))}");
+        //
+        //
+        //
+        //     dynamic time = "${formattedDate}_${lastDateTime['id']}";
+        //
+        //
+        //     print("FILES Already exists : ${lastDateTime['backUpTime']}_${lastDateTime['id']}");
+        //
+        //     // dynamic time = "${lastDateTime['backUpTime']}_${lastDateTime['id']+1}";
+        //
+        //     print("The current time is :${time}");
+        //     // return;
+        //
+        //
+        //     if (await File("${copyTo.path}/dynamicconnectdb_$time.db")
+        //         .exists())
+        //     {
+        //
+        //       print("Last Backup Id : ${lastDateTime['id']}");
+        //
+        //       int nextId = lastDateTime['id'] +1;
+        //
+        //       print("File Exist from db");
+        //
+        //       // await copyTo.create();
+        //
+        //       dynamic updatedTime = "${formattedDate}_${nextId.toString()}";
+        //
+        //       String? newPath =
+        //           "${copyTo.path}/dynamicconnectdb_$updatedTime.db";
+        //
+        //       await source1.copy(newPath);
+        //
+        //       await _sqlHelper.setBackUpTime();
+        //
+        //       showDialogCheck("Backup updated in the specific download folder "
+        //           "\n $updatedTime");
+        //
+        //       return;
+        //     }
+        //     else{
+        //
+        //       print("File  Not Exist from db");
+        //       // print();
+        //       print("Date Time");
+        //
+        //
+        //       String formattedDate = DateFormat('yyyy-MM-dd')
+        //           .format(DateTime.parse(lastDateTime['backUpTime'].toString()));
+        //
+        //
+        //       print("Formatted Date Line 813 : $formattedDate");
+        //       // var format =  DateFormat('dd-MM-yyyy');
+        //
+        //       // print("Formatted : ${format.parse(lastDateTime['backUpTime'].toString().substring(12))}");
+        //
+        //       dynamic updatedTime = "${formattedDate}_${lastDateTime['id']+1}";
+        //
+        //
+        //       print("The not exist time is :${updatedTime}  path :"
+        //           "\n ${source1.path}");
+        //       // await copyTo.create();
+        //
+        //
+        //
+        //       String? newPath =
+        //           "${copyTo.path}/dynamicconnectdb_$updatedTime.db";
+        //
+        //       print("New Path is : ${newPath}");
+        //
+        //       await source1.copy(newPath);
+        //       await _sqlHelper.setBackUpTime();
+        //
+        //       showDialogCheck("Backup updated in the specific download folder "
+        //           "AT Time : $time");
+        //
+        //       return;
+        //     }
+        //
+        //
+        //
+        //     // print("Last time is : ${lastDateTime.toString()}");
+        //   }
+
+
+
+
+        await copyTo.create();
+
+        String? newPath =
+            "${copyTo.path}/dynamicconnectdb.db";
+
+        await source1.copy(newPath);
+        showDialogCheck("BackUp Success Date ${DateTime.now().toIso8601String().substring(0,10)}");
+
+      },
+    );
+
+    Widget noButton =
+
+    TextButton(
+        style: APPConstants().btnBackgroundNo,
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        child: Text(
+          "No",
+          style: APPConstants().YesText,
+        )
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("DynamicsConnect"),
+      content: Text("$text"),
+      actions: [
+        yesButton,
+        noButton
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 
   showDialogGotRoute({String? text, dynamic op}) {
@@ -904,208 +1359,13 @@ class _AppGeneralPageState extends State<AppGeneralPage> {
                                 .styleFrom(
                                 backgroundColor: Colors.red
                             ),
+
                         onPressed: () async {
 
+                          showDialogBackUpRoute(
+                          text:  "Previous backup will be replaced or lost ,Are You Sure ?"
+                          );
 
-                          File source1 = File(
-                              '/storage/emulated/0/Android/data/com.example.dynamicconnectapps/files/stockCountApp/dynamicconnectdb.db');
-
-                          Directory copyTo = Directory(
-                              "/storage/emulated/0/Download/stockCountApp");
-
-                          var status = await Permission.storage.status;
-
-                          if (!status.isGranted) {
-                            await Permission.storage.request();
-                          }
-
-                          bool storagePermission =
-                              await Permission.storage.isGranted;
-                          bool mediaPermission =
-                              await Permission.accessMediaLocation.isGranted;
-                          bool manageExternal =
-                              await Permission.manageExternalStorage.isGranted;
-
-                          if (!storagePermission) {
-                            storagePermission =
-                                await Permission.storage.request().isGranted;
-                          }
-
-                          if (!mediaPermission) {
-                            mediaPermission = await Permission
-                                .accessMediaLocation
-                                .request()
-                                .isGranted;
-                          }
-
-                          if (!manageExternal) {
-                            manageExternal = await Permission
-                                .manageExternalStorage
-                                .request()
-                                .isGranted;
-                          }
-
-                          bool isPermissionGranted = storagePermission &&
-                              mediaPermission &&
-                              manageExternal;
-
-                          if (isPermissionGranted) {
-                            print("Permission  Granted :"
-                                "storage : ${storagePermission}\t"
-                                "Media :${mediaPermission}\t"
-                                "Manage External : ${manageExternal}");
-                          }
-                          else
-                          {
-                            print("Permission Not Granted :"
-                                "storage : ${storagePermission}\t"
-                                "Media :${mediaPermission}\t"
-                                "Manage External : ${manageExternal}");
-                          }
-
-                        // var lastDateTime = await _sqlHelper.getLastBackUpDetails();
-                        //
-                        //   print("Last Time BackUp : ${lastDateTime.toString()}");
-                        //
-                        //   // return;
-                        //
-                        //   if(lastDateTime == null ){
-                        //
-                        //     if (await File("${copyTo.path}/dynamicconnectdb.db")
-                        //         .exists())
-                        //     {
-                        //       await copyTo.create();
-                        //
-                        //       String? newPath =
-                        //           "${copyTo.path}/dynamicconnectdb.db";
-                        //
-                        //       await source1.copy(newPath);
-                        //       await _sqlHelper.setBackUpTime();
-                        //       showDialogCheck("Backup Added in the Device Download Folder");
-                        //       print("file Exist");
-                        //       return;
-                        //     }
-                        //     else{
-                        //       await copyTo.create();
-                        //
-                        //       String? newPath =
-                        //           "${copyTo.path}/dynamicconnectdb.db";
-                        //
-                        //       await source1.copy(newPath);
-                        //       await _sqlHelper.setBackUpTime();
-                        //       showDialogCheck("Backup Added in the Device Download Folder");
-                        //       print("file Exist");
-                        //       return;
-                        //     }
-                        //
-                        //   }
-                        //   else
-                        //   {
-                        //
-                        //     String formattedDate = DateFormat('yyyy-MM-dd')
-                        //         .format(DateTime.parse(lastDateTime['backUpTime'].toString()));
-                        //
-                        //     print("Formatted Date Line 813 : $formattedDate");
-                        //     // var format =  DateFormat('dd-MM-yyyy');
-                        //
-                        //     // print("Formatted : ${format.parse(lastDateTime['backUpTime'].toString().substring(12))}");
-                        //
-                        //
-                        //
-                        //     dynamic time = "${formattedDate}_${lastDateTime['id']}";
-                        //
-                        //
-                        //     print("FILES Already exists : ${lastDateTime['backUpTime']}_${lastDateTime['id']}");
-                        //
-                        //     // dynamic time = "${lastDateTime['backUpTime']}_${lastDateTime['id']+1}";
-                        //
-                        //     print("The current time is :${time}");
-                        //     // return;
-                        //
-                        //
-                        //     if (await File("${copyTo.path}/dynamicconnectdb_$time.db")
-                        //         .exists())
-                        //     {
-                        //
-                        //       print("Last Backup Id : ${lastDateTime['id']}");
-                        //
-                        //       int nextId = lastDateTime['id'] +1;
-                        //
-                        //       print("File Exist from db");
-                        //
-                        //       // await copyTo.create();
-                        //
-                        //       dynamic updatedTime = "${formattedDate}_${nextId.toString()}";
-                        //
-                        //       String? newPath =
-                        //           "${copyTo.path}/dynamicconnectdb_$updatedTime.db";
-                        //
-                        //       await source1.copy(newPath);
-                        //
-                        //       await _sqlHelper.setBackUpTime();
-                        //
-                        //       showDialogCheck("Backup updated in the specific download folder "
-                        //           "\n $updatedTime");
-                        //
-                        //       return;
-                        //     }
-                        //     else{
-                        //
-                        //       print("File  Not Exist from db");
-                        //       // print();
-                        //       print("Date Time");
-                        //
-                        //
-                        //       String formattedDate = DateFormat('yyyy-MM-dd')
-                        //           .format(DateTime.parse(lastDateTime['backUpTime'].toString()));
-                        //
-                        //
-                        //       print("Formatted Date Line 813 : $formattedDate");
-                        //       // var format =  DateFormat('dd-MM-yyyy');
-                        //
-                        //       // print("Formatted : ${format.parse(lastDateTime['backUpTime'].toString().substring(12))}");
-                        //
-                        //       dynamic updatedTime = "${formattedDate}_${lastDateTime['id']+1}";
-                        //
-                        //
-                        //       print("The not exist time is :${updatedTime}  path :"
-                        //           "\n ${source1.path}");
-                        //       // await copyTo.create();
-                        //
-                        //
-                        //
-                        //       String? newPath =
-                        //           "${copyTo.path}/dynamicconnectdb_$updatedTime.db";
-                        //
-                        //       print("New Path is : ${newPath}");
-                        //
-                        //       await source1.copy(newPath);
-                        //       await _sqlHelper.setBackUpTime();
-                        //
-                        //       showDialogCheck("Backup updated in the specific download folder "
-                        //           "AT Time : $time");
-                        //
-                        //       return;
-                        //     }
-                        //
-                        //
-                        //
-                        //     // print("Last time is : ${lastDateTime.toString()}");
-                        //   }
-
-
-
-
-                          await copyTo.create();
-
-                          String? newPath =
-                              "${copyTo.path}/dynamicconnectdb.db";
-
-                          await source1.copy(newPath);
-
-
-
-                          showDialogCheck("BackUp Success Date ${DateTime.now().toIso8601String().substring(0,10)}");
                         },
                         child: Text("BACKUP",
                         style: TextStyle(
@@ -1122,170 +1382,15 @@ class _AppGeneralPageState extends State<AppGeneralPage> {
                       style: TextButton.styleFrom(backgroundColor: Colors.red),
                       onPressed: () async {
 
-                        File source1 = File(
-                            '/storage/emulated/0/Download/stockCountApp/dynamicconnectdb.db');
-
-                        Directory copyTo = Directory(
-                          '/storage/emulated/0/Android/data/com.example.dynamicconnectapps/files/stockCountApp');
-                            // "/storage/emulated/0/Download/stockCountApp");
-
-                        var status = await Permission.storage.status;
-
-                        if (!status.isGranted) {
-                          await Permission.storage.request();
-                        }
-
-                        bool storagePermission =
-                        await Permission.storage.isGranted;
-                        bool mediaPermission =
-                        await Permission.accessMediaLocation.isGranted;
-                        bool manageExternal =
-                        await Permission.manageExternalStorage.isGranted;
-
-                        if (!storagePermission) {
-                          storagePermission =
-                          await Permission.storage.request().isGranted;
-                        }
-
-                        if (!mediaPermission) {
-                          mediaPermission = await Permission
-                              .accessMediaLocation
-                              .request()
-                              .isGranted;
-                        }
-
-                        if (!manageExternal) {
-                          manageExternal = await Permission
-                              .manageExternalStorage
-                              .request()
-                              .isGranted;
-                        }
-
-                        bool isPermissionGranted = storagePermission &&
-                            mediaPermission &&
-                            manageExternal;
-
-                        if (isPermissionGranted) {
-                          print("Permission  Granted :"
-                              "storage : ${storagePermission}\t"
-                              "Media :${mediaPermission}\t"
-                              "Manage External : ${manageExternal}");
-                        } else {
-                          print("Permission Not Granted :"
-                              "storage : ${storagePermission}\t"
-                              "Media :${mediaPermission}\t"
-                              "Manage External : ${manageExternal}");
-                        }
-
-                        var databasespath = await getExternalStorageDirectory();
 
 
-                        print("The original path is : ${databasespath!.path}/stockCountApp/dynamicconnectdb.db");
+                        showDialogRestoreRoute(
+                            text:  "Are You Sure to Restore ?",
+
+                        );
 
 
-                        // var databasesPath = await getDatabasesPath();
-                        var dbPath = '${databasespath.path}/stockCountApp/dynamicconnectdb.db';
-
-                        // var result = await FilesystemPicker.open(allowedExtensions: [".png", ".jpg"],
-                        //     context: context,rootDirectory: appDocDir);
-
-
-                        // await showDialogExternalLocation("Last Backups ");
-                        //
-                        //
-                        //
-                        //
-                        // // file picker
-                        //
-                        //
-                        // FilePickerResult? result =
-                        // await FilePicker.platform.pickFiles(
-                        //   type: FileType.custom,
-                        //   // allowedExtensions: ['db'],
-                        //   // allowMultiple: false
-                        // );
-                        //
-                        // // FilePicker.platform.getDirectoryPath().;
-                        // // getFilePath(type: FileType.CUSTOM, fileExtension: 'json’);
-                        //
-                        // if (result != null) {
-                        //
-                        //   File source = File(result.files.single.path!);
-                        //   await source.copy(dbPath);
-                        //   // setState(() {
-                        //   //   message = 'Successfully Restored DB';
-                        //   // });
-                        // } else {
-                        //   // User canceled the picker
-                        //
-                        // }
-
-
-
-
-
-
-
-                        // final result = await FilePicker.platform.pickFiles(
-                        //   type: FileType.custom,
-                        //   allowedExtensions: ['json'],
-                        // );
-                        //
-                        // if (result != null) {
-                        //
-                        //   File file = File(result.files.single.path!);
-                        //
-                        //   print("The file is : ${file}");
-                        // } else {
-                        //   print("No file selected");
-                        // }
-                        // if (await File("${copyTo.path}/dynamicconnectapp.db")
-                        //     .exists()) {
-                        //
-                        //   showDialogCheck("File Already exist in the specific download folder");
-                        //   print("file Exist");
-                        //   return;
-                        // }
-
-                        // try{
-                        //
-                          // await source1.create();
-
-
-                        ///delete file  after rename
-
-                        // await File(filepath).delete();
-                        // await file.delete();
-
-                        /// rename file to db folder
-                        ///
-                        // file.rename(newPath);
-
-                        /// rename file with example
-
-
-                        // final file = File("filepath here"); // Your file path
-                        // String dir = path.dirname(file.path); // Get directory
-                        // String newPath = path.join(dir, 'new file name'); // Rename
-                        // print(newPath); // Here is the newpath
-                        // file.renameSync(newPath)
-
-
-
-
-
-                          print("Restore Success : ${copyTo.path}/dynamicconnectdb.db");
-                          print("Directory : ${source1}");
-
-
-                          String? newPath =
-                              "${copyTo.path}/dynamicconnectdb.db";
-
-                          await source1.copy(newPath);
-
-
-                          showDialogCheck("Restore Success Date  ${DateTime.now().toIso8601String().substring(0,10)}");
-                        // }
+                       // }
                         // catch(e){
                         //
                         //   showDialogCheck("Error : ${e.toString()}");
@@ -2188,6 +2293,7 @@ class _AppGeneralPageState extends State<AppGeneralPage> {
 
                         Row(
                           children: [
+
                             Expanded(
                               child: TextButton(
                                 style: TextButton.styleFrom(

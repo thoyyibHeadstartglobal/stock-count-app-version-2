@@ -19,6 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/constant.dart';
 
 class OnHandPage extends StatefulWidget {
+
   OnHandPage({this.itemDetails, this.isItemMasters});
 
   // PriceCheckPage({this.type,this.isImportedSearch,this.transDetails});
