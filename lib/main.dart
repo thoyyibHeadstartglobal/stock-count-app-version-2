@@ -7,6 +7,8 @@ import 'package:dynamicconnectapp/splash_screen/splash_screen_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'app_setting_pages/project_setting_environment_page.dart';
+
 void main()async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -75,10 +77,10 @@ var connectionStatus;
       // theme: ThemeData(
         // primarySwatch: Colors.blue,
       // ),
-      home: SplashScreenPage()
-      // ProjectSettingsEnvironmentPage(
-      //   isSettings: false,
-      // ),
+      home:
+      ProjectSettingsEnvironmentPage(
+        isSettings: false,
+      ),
     );
   }
 }
