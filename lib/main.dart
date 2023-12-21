@@ -78,9 +78,8 @@ var connectionStatus;
         // primarySwatch: Colors.blue,
       // ),
       home:
-      ProjectSettingsEnvironmentPage(
-        isSettings: false,
-      ),
+      SplashScreenPage()
+
     );
   }
 }
